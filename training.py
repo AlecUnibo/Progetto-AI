@@ -1,6 +1,13 @@
-def train_model(model, train_loader, criterion, optimizer, device, epochs=5):
+import numpy as np
+import torch
+def train_model(model, train_loader, test_loader, criterion, optimizer, device, epochs=50, patience=5):
     model.train()
+    best_loss = np.inf
+    patience_counter = 0
+
     for epoch in range(epochs):
+        # Training
+        model.train()
         running_loss = 0.0
         correct = 0
         total = 0
@@ -15,4 +22,41 @@ def train_model(model, train_loader, criterion, optimizer, device, epochs=5):
             _, preds = outputs.max(1)
             correct += preds.eq(labels).sum().item()
             total += labels.size(0)
-        print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader):.4f}, Accuracy: {100*correct/total:.2f}%")
+        
+        train_loss = running_loss / len(train_loader)
+        train_acc = 100 * correct / total
+
+        # Validation
+        model.eval()
+        val_loss = 0.0
+        val_correct = 0
+        val_total = 0
+        with torch.no_grad():
+            for images, labels in test_loader:
+                images, labels = images.to(device), labels.to(device)
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                val_loss += loss.item()
+                _, preds = outputs.max(1)
+                val_correct += preds.eq(labels).sum().item()
+                val_total += labels.size(0)
+        
+        val_loss /= len(test_loader)
+        val_acc = 100 * val_correct / val_total
+
+        print(f"Epoch {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%, "
+              f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%")
+
+        # Early Stopping
+        if val_loss < best_loss:
+            best_loss = val_loss
+            patience_counter = 0
+            best_model_state = model.state_dict()  # Salva lo stato del miglior modello
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                print("Early stopping triggered.")
+                break
+
+    model.load_state_dict(best_model_state)  # Carica il miglior modello
+    return model

@@ -16,9 +16,13 @@ def evaluate_model(model, test_loader, idx_to_class, device):
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
 
-    print(classification_report(all_labels, all_preds, target_names=[str(v) for v in idx_to_class.values()]))
-
+    print("Classification Report:")
+    print(classification_report(all_labels, all_preds, target_names=list(idx_to_class.values())))
 
     cm = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 7))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=idx_to_class.values(), yticklabels=idx_to_class.values())
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.title("Confusion Matrix")
     plt.show()

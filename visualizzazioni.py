@@ -21,7 +21,7 @@ def visualize_predictions(model, test_loader, idx_to_class, device, num_images=2
                 img = img * np.array([0.229, 0.224, 0.225]) + np.array([0.485, 0.456, 0.406])  # Denormalizzazione
                 img = np.clip(img, 0, 1)
 
-                plt.subplot(3, 5, shown + 1)  # 3 righe e 5 collonne
+                plt.subplot(4, 5, shown + 1)  # 4 righe e 5 collonne
                 plt.imshow(img)
                 plt.axis('off')
                 true_label = idx_to_class[labels[i].item()]

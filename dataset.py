@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import torch
 
-class AnimalDataset(Dataset):
+class PlaceDataset(Dataset):
     def __init__(self, images_dir, labels_df, transform=None):
         self.images_dir = images_dir
         self.labels = labels_df
