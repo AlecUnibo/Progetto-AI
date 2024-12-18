@@ -1,6 +1,12 @@
 import numpy as np
 import torch
-def train_model(model, train_loader, test_loader, criterion, optimizer, device, epochs=50, patience=5):
+def train_model(model, train_loader, test_loader, criterion, optimizer, device, model_name, epochs=50, patience=5):
+    
+    if model_name:
+        print(f"\nInizio del training di {model_name}\n")
+    else:
+        print("\nInizio del training\n")
+
     model.train()
     best_loss = np.inf
     patience_counter = 0

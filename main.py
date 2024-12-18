@@ -43,14 +43,19 @@ resnet_scheduler = StepLR(resnet_optimizer, step_size=5, gamma=0.5)
 efficientnet_scheduler = StepLR(efficientnet_optimizer, step_size=5, gamma=0.5)
 
 # Training aggiornato con scheduler
-train_model(resnet_model, train_loader, test_loader, criterion, resnet_optimizer, device)
+train_model(resnet_model, train_loader, test_loader, criterion, resnet_optimizer, device, model_name="ResNet50")
 resnet_scheduler.step()
 
-train_model(efficientnet_model, train_loader, test_loader, criterion, efficientnet_optimizer, device)
+train_model(efficientnet_model, train_loader, test_loader, criterion, efficientnet_optimizer, device, model_name="EfficientNet")
 efficientnet_scheduler.step()
 
 # Valutazione e visualizzazione
-evaluate_model(resnet_model, test_loader, train_dataset.get_idx_to_class(), device)
-evaluate_model(efficientnet_model, test_loader, train_dataset.get_idx_to_class(), device)
+evaluate_model(resnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="ResNet50")
+evaluate_model(efficientnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="EfficientNet")
 
-visualize_predictions(resnet_model, test_loader, train_dataset.get_idx_to_class(), device)
+# Visualizzazione delle predizioni per ResNet50
+visualize_predictions(resnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="ResNet50")
+
+# Visualizzazione delle predizioni per EfficientNet
+visualize_predictions(efficientnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="EfficientNet")
+

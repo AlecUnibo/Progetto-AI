@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
 
-def evaluate_model(model, test_loader, idx_to_class, device):
+def evaluate_model(model, test_loader, idx_to_class, device, model_name=""):
     model.eval()
     all_preds = []
     all_labels = []
@@ -16,7 +16,10 @@ def evaluate_model(model, test_loader, idx_to_class, device):
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
 
-    print("Classification Report:")
+    if model_name:
+        print(f"Classification Report per il modello: {model_name}")
+    else:
+        print("Classification Report:")
     print(classification_report(all_labels, all_preds, target_names=list(idx_to_class.values())))
 
     cm = confusion_matrix(all_labels, all_preds)
