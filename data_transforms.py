@@ -21,7 +21,7 @@ def get_transforms():
 
     return train_transform, test_transform
 
-def split_data(labels, val_size=0.2, test_size=0.2, random_state=42):
+def split_data(labels, val_size, test_size, random_state): #accetta direttamente parametri di configurazione tramite test_size e val_size
     train_val_labels, test_labels = train_test_split(
         labels, test_size=test_size, stratify=labels['class'], random_state=random_state
     )
@@ -30,7 +30,7 @@ def split_data(labels, val_size=0.2, test_size=0.2, random_state=42):
     )
     return train_labels, val_labels, test_labels
 
-def create_dataloaders(image_dir, train_labels, val_labels, test_labels, train_transform, test_transform, batch_size=32):
+def create_dataloaders(image_dir, train_labels, val_labels, test_labels, train_transform, test_transform, batch_size):
     train_dataset = PlaceDataset(images_dir=image_dir, labels_df=train_labels, transform=train_transform)
     val_dataset = PlaceDataset(images_dir=image_dir, labels_df=val_labels, transform=test_transform)
     test_dataset = PlaceDataset(images_dir=image_dir, labels_df=test_labels, transform=test_transform)

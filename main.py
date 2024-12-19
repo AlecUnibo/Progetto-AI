@@ -8,24 +8,39 @@ from visualizzazioni import visualize_predictions
 from torch import nn, optim
 from torch.optim.lr_scheduler import StepLR
 from analyze_dataset import analyze_dataset
+import json
 
+# Carica configurazioni da config.json
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Dataset
-image_dir = "archive 4/images"
-classes = ["buildings", "mountain", "sea", "street"]
+image_dir = config["image_dir"]
+classes = config["classes"]
 labels = create_labels(image_dir, classes)
 
-# Analisi del dattaset
+# Analisi del dataset
 analyze_dataset(labels)
 
 # Trasformazioni e dataloader
 train_transform, test_transform = get_transforms()
-train_labels, val_labels, test_labels = split_data(labels)
+train_labels, val_labels, test_labels = split_data(
+    labels,
+    val_size=config["val_size"],
+    test_size=config["test_size"],
+    random_state=config["random_state"]
+)
 
 train_loader, val_loader, test_loader, train_dataset, test_dataset = create_dataloaders(
-    image_dir, train_labels, val_labels, test_labels, train_transform, test_transform
+    image_dir,
+    train_labels,
+    val_labels,
+    test_labels,
+    train_transform,
+    test_transform,
+    batch_size=config["batch_size"]
 )
 
 # Inizializzazione dei modelli
@@ -35,18 +50,39 @@ efficientnet_model = EfficientNetModel(num_classes).to(device)
 
 # Configurazione perdita e ottimizzatore
 criterion = nn.CrossEntropyLoss()
-# Configurazione ottimizzatore e scheduler
-resnet_optimizer = optim.Adam(resnet_model.parameters(), lr=1e-4)
-efficientnet_optimizer = optim.Adam(efficientnet_model.parameters(), lr=1e-4)
 
-resnet_scheduler = StepLR(resnet_optimizer, step_size=5, gamma=0.5)
-efficientnet_scheduler = StepLR(efficientnet_optimizer, step_size=5, gamma=0.5)
+# Configurazione ottimizzatore e scheduler
+resnet_optimizer = optim.Adam(resnet_model.parameters(), lr=config["learning_rate"])
+efficientnet_optimizer = optim.Adam(efficientnet_model.parameters(), lr=config["learning_rate"])
+
+resnet_scheduler = StepLR(resnet_optimizer, step_size=config["step_size"], gamma=config["gamma"])
+efficientnet_scheduler = StepLR(efficientnet_optimizer, step_size=config["step_size"], gamma=config["gamma"])
 
 # Training aggiornato con scheduler
-train_model(resnet_model, train_loader, test_loader, criterion, resnet_optimizer, device, model_name="ResNet50")
+train_model(
+    resnet_model,
+    train_loader,
+    val_loader,
+    criterion,
+    resnet_optimizer,
+    device,
+    model_name="ResNet50",
+    epochs=config["epochs"],
+    patience=config["patience"]
+)
 resnet_scheduler.step()
 
-train_model(efficientnet_model, train_loader, test_loader, criterion, efficientnet_optimizer, device, model_name="EfficientNet")
+train_model(
+    efficientnet_model,
+    train_loader,
+    val_loader,
+    criterion,
+    efficientnet_optimizer,
+    device,
+    model_name="EfficientNet",
+    epochs=config["epochs"],
+    patience=config["patience"]
+)
 efficientnet_scheduler.step()
 
 # Valutazione e visualizzazione
@@ -58,4 +94,3 @@ visualize_predictions(resnet_model, test_loader, train_dataset.get_idx_to_class(
 
 # Visualizzazione delle predizioni per EfficientNet
 visualize_predictions(efficientnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="EfficientNet")
-
