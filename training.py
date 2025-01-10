@@ -1,7 +1,8 @@
 import numpy as np
 import torch
+import os
+
 def train_model(model, train_loader, test_loader, criterion, optimizer, device, model_name, epochs=50, patience=5):
-    
     if model_name:
         print(f"\nInizio del training di {model_name}\n")
     else:
@@ -10,6 +11,8 @@ def train_model(model, train_loader, test_loader, criterion, optimizer, device, 
     model.train()
     best_loss = np.inf
     patience_counter = 0
+    best_model_path = f"{model_name}_best.pth"  # Salva il modello migliore
+    last_model_path = f"{model_name}_last.pth"  # Salva l'ultimo modello
 
     for epoch in range(epochs):
         # Training
@@ -53,16 +56,24 @@ def train_model(model, train_loader, test_loader, criterion, optimizer, device, 
         print(f"Epoch {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%, "
               f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%")
 
-        # Early Stopping
+        # Salvataggio del miglior modello
         if val_loss < best_loss:
             best_loss = val_loss
             patience_counter = 0
             best_model_state = model.state_dict()  # Salva lo stato del miglior modello
+            torch.save(best_model_state, best_model_path)  # Salva su disco il miglior modello
+            print(f"Salvato miglior modello: {best_model_path}")
         else:
             patience_counter += 1
             if patience_counter >= patience:
                 print("Early stopping triggered.")
                 break
 
-    model.load_state_dict(best_model_state)  # Carica il miglior modello
+    # Salva l'ultimo modello dopo il training
+    last_model_state = model.state_dict()
+    torch.save(last_model_state, last_model_path)
+    print(f"Salvato ultimo modello: {last_model_path}")
+
+    # Carica lo stato del miglior modello per restituirlo
+    model.load_state_dict(best_model_state)
     return model

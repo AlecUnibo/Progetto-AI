@@ -1,0 +1,81 @@
+{
+  "type": "object",
+  "properties": {
+    "image_dir": {
+      "type": "string",
+      "description": "Path alla directory che contiene le immagini del dataset.",
+      "minLength": 1
+    },
+    "classes": {
+      "type": "array",
+      "description": "Elenco delle classi del dataset.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "batch_size": {
+      "type": "integer",
+      "description": "Numero di immagini per batch.",
+      "minimum": 1
+    },
+    "epochs": {
+      "type": "integer",
+      "description": "Numero massimo di epoche di training.",
+      "minimum": 1
+    },
+    "learning_rate": {
+      "type": "number",
+      "description": "Tasso di apprendimento per l'ottimizzatore.",
+      "exclusiveMinimum": 0
+    },
+    "step_size": {
+      "type": "integer",
+      "description": "Intervallo di epoche dopo le quali ridurre il learning rate.",
+      "minimum": 1
+    },
+    "gamma": {
+      "type": "number",
+      "description": "Fattore di riduzione del learning rate.",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "patience": {
+      "type": "integer",
+      "description": "Numero di epoche consecutive senza miglioramento prima dell'Early Stopping.",
+      "minimum": 1
+    },
+    "random_state": {
+      "type": "integer",
+      "description": "Seed per numeri casuali, per garantire la riproducibilità.",
+      "minimum": 0
+    },
+    "test_size": {
+      "type": "number",
+      "description": "Proporzione di dati da riservare al test set.",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "val_size": {
+      "type": "number",
+      "description": "Proporzione di dati rimanenti da riservare al validation set.",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    }
+  },
+  "required": [
+    "image_dir",
+    "classes",
+    "batch_size",
+    "epochs",
+    "learning_rate",
+    "step_size",
+    "gamma",
+    "patience",
+    "random_state",
+    "test_size",
+    "val_size"
+  ],
+  "additionalProperties": false
+}

@@ -1,2 +1,17 @@
-"__pycache__/" 
-"*.pyc" 
+# Ignora la cartella __pycache__
+__pycache__/
+
+# Ignora i file .pyc
+*.pyc
+
+# Ignora cartelle temporanee
+runs/
+
+# Ignora file pesanti dei modelli (se non servono su GitHub)
+*.pth
+
+# Ignora file di archivio
+archive.zip
+
+# Ignora altri file non necessari
+archive 4/

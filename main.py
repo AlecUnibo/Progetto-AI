@@ -9,11 +9,36 @@ from torch import nn, optim
 from torch.optim.lr_scheduler import StepLR
 from analyze_dataset import analyze_dataset
 import json
+from jsonschema import validate, ValidationError
+import numpy as np
+import random
+
+# Carica lo schema di validazione
+with open("config_schema.json", "r") as schema_file:
+    config_schema = json.load(schema_file)
 
 # Carica configurazioni da config.json
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
 
+# Valida la configurazione
+try:
+    validate(instance=config, schema=config_schema)
+    print("Configurazione valida.")
+except ValidationError as e:
+    print("Errore di validazione nella configurazione:", e)
+    exit(1)
+
+# Imposta il seed per la riproducibilità
+seed = config["random_state"]
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)  # Per CUDA
+np.random.seed(seed)
+random.seed(seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+# Imposta il dispositivo
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Dataset
