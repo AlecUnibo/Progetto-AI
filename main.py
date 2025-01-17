@@ -13,15 +13,15 @@ from jsonschema import validate, ValidationError
 import numpy as np
 import random
 
-# Carica lo schema di validazione
+# Carico lo schema di validazione
 with open("config_schema.json", "r") as schema_file:
     config_schema = json.load(schema_file)
 
-# Carica configurazioni da config.json
+# Carico configurazioni da config.json
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
 
-# Valida la configurazione
+# Validazione configurazione
 try:
     validate(instance=config, schema=config_schema)
     print("Configurazione valida.")
@@ -29,7 +29,7 @@ except ValidationError as e:
     print("Errore di validazione nella configurazione:", e)
     exit(1)
 
-# Imposta il seed per la riproducibilità
+# seed per la invariare comport. training 
 seed = config["random_state"]
 torch.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)  # Per CUDA
@@ -38,7 +38,7 @@ random.seed(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-# Imposta il dispositivo
+# ________________________________________________________________
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Dataset
@@ -46,7 +46,6 @@ image_dir = config["image_dir"]
 classes = config["classes"]
 labels = create_labels(image_dir, classes)
 
-# Analisi del dataset
 analyze_dataset(labels)
 
 # Trasformazioni e dataloader
@@ -114,8 +113,8 @@ efficientnet_scheduler.step()
 evaluate_model(resnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="ResNet50")
 evaluate_model(efficientnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="EfficientNet")
 
-# Visualizzazione delle predizioni per ResNet50
+# Visualizzazione delle predizioni --> ResNet50
 visualize_predictions(resnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="ResNet50")
 
-# Visualizzazione delle predizioni per EfficientNet
+# Visualizzazione delle predizioni --> EfficientNet
 visualize_predictions(efficientnet_model, test_loader, train_dataset.get_idx_to_class(), device, model_name="EfficientNet")

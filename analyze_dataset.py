@@ -7,11 +7,9 @@ def analyze_dataset(labels_df):
     # Conta il numero di immagini per ogni classe
     class_counts = labels_df['class'].value_counts()
 
-    # Risultati
     print("Distribuzione delle classi:")
     print(class_counts)
 
-    # Grafico
     plt.figure(figsize=(10, 6))
     sns.barplot(x=class_counts.index, y=class_counts.values, palette="viridis")
     plt.xlabel("Classi")

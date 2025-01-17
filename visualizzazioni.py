@@ -25,7 +25,7 @@ def visualize_predictions(model, test_loader, idx_to_class, device, model_name="
                 plt.imshow(img)
                 plt.axis('off')
 
-                # Aggiorna il titolo per includere il nome del modello
+                # Qui includo nome modello 
                 true_label = idx_to_class[labels[i].item()]
                 pred_label = idx_to_class[preds[i].item()]
                 plt.title(
